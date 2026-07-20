@@ -20,6 +20,8 @@ Key functions:
 \item \code{\link[=sheet_freeze]{sheet_freeze()}}, \code{\link[=sheet_format_header]{sheet_format_header()}}, \code{\link[=sheet_format_tabcolor]{sheet_format_tabcolor()}} — sheet-level structure
 \item \code{\link[=range_merge]{range_merge()}} / \code{\link[=range_unmerge]{range_unmerge()}} — merged cells
 \item \code{\link[=gs4_cols]{gs4_cols()}} — reference a range by column header name instead of letter
+\item \code{\link[=gs4_glimpse_cols]{gs4_glimpse_cols()}} — preview a data frame's columns alongside
+their spreadsheet column letters
 \item \code{\link[=range_add_conditional_format]{range_add_conditional_format()}} + \code{\link[=cf_cell_value]{cf_cell_value()}} and friends — boolean conditional formatting
 \item \code{\link[=range_add_gradient_format]{range_add_gradient_format()}} + \code{\link[=cf_gradient]{cf_gradient()}} — gradient conditional formatting
 \item \code{\link[=range_write_format]{range_write_format()}} — write a data frame and format it in one call
