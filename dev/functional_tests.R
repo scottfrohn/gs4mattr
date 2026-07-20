@@ -32,17 +32,6 @@ gs4_auth()
 # Everything below writes into this single sheet. Delete it at the very end
 # (last section) once you've eyeballed everything.
 
-# ss <- gs4_create(
-#   "prettysheets-functional-test",
-#   sheets = list(
-#     basic = mtcars,
-#     conditional = data.frame(
-#       score = c(45, 62, 78, 90, 33, 88, 55, 71),
-#       flag = c("", "", "urgent", "", "urgent", "", "", "urgent")
-#     )
-#   )
-# )
-
 ## Test sheet name
 ss <- "https://docs.google.com/spreadsheets/d/11xchp8Ov6MytIKcgvTICThXpWAdAEcc_4cYa-m3V1l8/"
 
