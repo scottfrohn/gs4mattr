@@ -42,7 +42,6 @@ sheet_freeze(ss, n_rows = 1)
 ## Installation
 
 ```r
-# once pushed to GitHub:
 devtools::install_github("scottfrohn/prettysheets")
 ```
 
