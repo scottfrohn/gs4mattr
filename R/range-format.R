@@ -138,8 +138,7 @@ range_format <- function(ss,
 #'   \describe{
 #'     \item{`"top"`, `"bottom"`, `"left"`, `"right"`}{A single outer side.}
 #'     \item{`"outside"`}{Shorthand for all four outer sides, i.e.
-#'       `c("top", "bottom", "left", "right")`. This is what `range_format_border()`
-#'       drew when `sides` was `"all"` prior to prettysheets 0.0.0.9000's border rework.}
+#'       `c("top", "bottom", "left", "right")`.}
 #'     \item{`"inside"`}{Shorthand for the gridlines *between* cells in the
 #'       range, i.e. `c("innerHorizontal", "innerVertical")`.}
 #'     \item{`"innerHorizontal"`, `"innerVertical"`}{A single inner gridline

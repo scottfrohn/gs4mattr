@@ -31,8 +31,7 @@ to target one or more columns by header name.}
 \describe{
 \item{\code{"top"}, \code{"bottom"}, \code{"left"}, \code{"right"}}{A single outer side.}
 \item{\code{"outside"}}{Shorthand for all four outer sides, i.e.
-\code{c("top", "bottom", "left", "right")}. This is what \code{range_format_border()}
-drew when \code{sides} was \code{"all"} prior to prettysheets 0.0.0.9000's border rework.}
+\code{c("top", "bottom", "left", "right")}.}
 \item{\code{"inside"}}{Shorthand for the gridlines \emph{between} cells in the
 range, i.e. \code{c("innerHorizontal", "innerVertical")}.}
 \item{\code{"innerHorizontal"}, \code{"innerVertical"}}{A single inner gridline

@@ -36,15 +36,13 @@ test_that("cols_to_cell_limits keeps contiguous columns in one range", {
 })
 
 test_that("cols_to_cell_limits returns an unnamed list, even for a single contiguous run", {
-  # Regression test: split() (used internally to group matched column
-  # positions into contiguous runs) names each group by its run id ("1",
-  # "2", ...), and that name used to survive all the way out through
-  # lapply() into cols_to_cell_limits()'s/resolve_grid_ranges()'s return
-  # value. Harmless for a caller that uses each element on its own
-  # (range_format()), but silently broke any caller that bundles every
-  # element into one field (range_add_conditional_format()'s
-  # `ranges = grid_ranges`) -- a *named* list serializes to a JSON object
-  # instead of a JSON array, so the request landed malformed with no error.
+  # split() (used internally to group matched column positions into
+  # contiguous runs) names each group by its run id ("1", "2", ...); that
+  # name must not survive out through cols_to_cell_limits()'s/
+  # resolve_grid_ranges()'s return value. A caller that bundles every element
+  # into one field (range_add_conditional_format()'s `ranges = grid_ranges`)
+  # needs a plain unnamed list -- a named list serializes to a JSON object
+  # instead of the array the Sheets API expects.
   cols <- gs4_cols("mpg")
   limits <- cols_to_cell_limits(cols, header = names(mtcars))
   expect_null(names(limits))
@@ -161,7 +159,7 @@ test_that("resolve_grid_ranges resolves a live gs4_cols() selection to the corre
 
   out <- resolve_grid_ranges(ss = NULL, sheet = "pretty_custom", range = gs4_cols("score"))
 
-  expect_null(names(out)) # must be unnamed -- see the split()/unname() regression test above
+  expect_null(names(out)) # must be unnamed -- see cols_to_cell_limits()'s unname() test above
   expect_length(out, 1)
   gr <- out[[1]]
   expect_equal(gr$sheetId, 7)

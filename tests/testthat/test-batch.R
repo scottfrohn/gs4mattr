@@ -39,11 +39,10 @@ test_that("apply_requests() passes a list of requests straight through", {
 })
 
 test_that("apply_requests() surfaces an API error instead of failing silently", {
-  # Regression test: apply_requests() used to call request_make() and discard
-  # the result without ever checking the response -- a rejected request (e.g.
-  # a malformed body) would fail completely silently, no R error at all. It
-  # must now pipe the response through gargle::response_process(), whose job
-  # is exactly to raise on a bad status code.
+  # request_make() returns the raw httr response without checking its status,
+  # so apply_requests() must pipe it through gargle::response_process() --
+  # whose job is exactly to raise on a bad status code -- rather than
+  # discarding it and letting a rejected request fail silently.
   local_mocked_bindings(as_sheets_id = function(x) x, .package = "googlesheets4")
   local_mocked_bindings(
     request_generate = function(endpoint, params) list(endpoint = endpoint, params = params),

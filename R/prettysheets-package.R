@@ -12,9 +12,16 @@
 #'   \item [range_format()] / [range_format_border()] — basic cell formatting
 #'   \item [sheet_freeze()], [sheet_format_header()], [sheet_format_tabcolor()] — sheet-level structure
 #'   \item [range_merge()] / [range_unmerge()] — merged cells
+#'   \item [gs4_cols()] — reference a range by column header name instead of letter
 #'   \item [range_add_conditional_format()] + [cf_cell_value()] and friends — boolean conditional formatting
 #'   \item [range_add_gradient_format()] + [cf_gradient()] — gradient conditional formatting
 #'   \item [range_write_format()] — write a data frame and format it in one call
+#'   \item [gs_theme()] / [modify_theme()] + [write_pretty_sheet()] — build a
+#'     reusable table style and apply it when writing a data frame
+#'   \item [gs_theme_clean()] and friends (see `gs_theme_presets`) — apply a
+#'     built-in table style immediately to an existing sheet
+#'   \item [read_pretty_sheet()] — read a sheet's data together with a
+#'     reconstructed [gs_theme()] describing how it's formatted
 #'   \item [prettysheets_batch()] — batch several formatting calls into one API request
 #' }
 #'

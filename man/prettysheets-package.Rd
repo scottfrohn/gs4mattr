@@ -19,9 +19,16 @@ Key functions:
 \item \code{\link[=range_format]{range_format()}} / \code{\link[=range_format_border]{range_format_border()}} — basic cell formatting
 \item \code{\link[=sheet_freeze]{sheet_freeze()}}, \code{\link[=sheet_format_header]{sheet_format_header()}}, \code{\link[=sheet_format_tabcolor]{sheet_format_tabcolor()}} — sheet-level structure
 \item \code{\link[=range_merge]{range_merge()}} / \code{\link[=range_unmerge]{range_unmerge()}} — merged cells
+\item \code{\link[=gs4_cols]{gs4_cols()}} — reference a range by column header name instead of letter
 \item \code{\link[=range_add_conditional_format]{range_add_conditional_format()}} + \code{\link[=cf_cell_value]{cf_cell_value()}} and friends — boolean conditional formatting
 \item \code{\link[=range_add_gradient_format]{range_add_gradient_format()}} + \code{\link[=cf_gradient]{cf_gradient()}} — gradient conditional formatting
 \item \code{\link[=range_write_format]{range_write_format()}} — write a data frame and format it in one call
+\item \code{\link[=gs_theme]{gs_theme()}} / \code{\link[=modify_theme]{modify_theme()}} + \code{\link[=write_pretty_sheet]{write_pretty_sheet()}} — build a
+reusable table style and apply it when writing a data frame
+\item \code{\link[=gs_theme_clean]{gs_theme_clean()}} and friends (see \code{gs_theme_presets}) — apply a
+built-in table style immediately to an existing sheet
+\item \code{\link[=read_pretty_sheet]{read_pretty_sheet()}} — read a sheet's data together with a
+reconstructed \code{\link[=gs_theme]{gs_theme()}} describing how it's formatted
 \item \code{\link[=prettysheets_batch]{prettysheets_batch()}} — batch several formatting calls into one API request
 }
 

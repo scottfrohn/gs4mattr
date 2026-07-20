@@ -33,7 +33,7 @@ test_that("parse_range_shorthand understands whole-row shorthand like '2:5'", {
   expect_true(is.na(limits$lr[2]))
 })
 
-test_that("parse_range_shorthand errors the same way as before on nonsense strings", {
+test_that("parse_range_shorthand errors on nonsense strings", {
   # cellranger's own guess_fo() emits a "NAs generated." warning en route to
   # the error for input this malformed -- harmless, but silenced so it
   # doesn't get flagged as an unhandled warning alongside the expected error.

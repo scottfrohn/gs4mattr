@@ -1,0 +1,203 @@
+---
+title: "Getting started with prettysheets"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Getting started with prettysheets}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>",
+  eval = FALSE
+)
+```
+
+`prettysheets` extends [`googlesheets4`](https://googlesheets4.tidyverse.org/)
+with a formatting layer for Google Sheets: cell formatting, borders, merged
+cells, frozen rows/columns, tab colors, conditional formatting, and reusable
+table themes. Every function reuses whatever auth `googlesheets4` already
+has active, and function names/argument order mirror `googlesheets4`'s own
+conventions (`gs4_*` spreadsheet-level, `sheet_*` worksheet-level, `range_*`
+range-level), so it behaves like a natural extension rather than a separate
+tool.
+
+Every example below talks to a real Google Sheet, so it isn't run when this
+vignette is built. Copy the code into a live R session with a Google account
+already authenticated (or about to be, via `googlesheets4::gs4_auth()`) to
+try it.
+
+```{r setup}
+library(googlesheets4)
+library(prettysheets)
+
+ss <- gs4_create("prettysheets-demo", sheets = list(cars = mtcars))
+```
+
+## Basic cell formatting
+
+`range_format()` is `prettysheets`'s equivalent of
+`googlesheets4::range_write()` for styling rather than data: same `ss`,
+`sheet`, `range` argument order, and it accepts the same range inputs (A1
+strings or `cellranger` helpers).
+
+```{r}
+range_format(ss, sheet = "cars", range = "A1:K1", bold = TRUE, background_color = "#D9E1F2")
+range_format(ss, sheet = "cars", range = "B2:B33", number_format = "0.0", horizontal_alignment = "RIGHT")
+```
+
+Repeated calls layer on top of each other rather than overwriting -- only
+the arguments you actually supply are touched. Pass `clear_first = TRUE` to
+reset a range to blank before applying new formatting instead.
+
+Colors can be a hex string, a named R color, or a name from the built-in
+Google Sheets color picker grid (`gs4_palette`, looked up via
+`gs4_palette_color()`):
+
+```{r}
+range_format(ss, sheet = "cars", range = "H3:I4", background_color = "dark yellow 1")
+gs4_color("light cornflower blue 1")
+```
+
+Other structural helpers follow the same pattern:
+
+```{r}
+range_format_border(ss, sheet = "cars", range = "A1:K33", sides = "outside", color = "gray40")
+range_merge(ss, sheet = "cars", range = "A1:B1")
+sheet_freeze(ss, sheet = "cars", n_rows = 1)
+sheet_format_header(ss, sheet = "cars") # bold header + freeze, for data written with range_write()
+sheet_format_tabcolor(ss, sheet = "cars", color = "forestgreen")
+sheet_clear_format(ss, sheet = "cars") # reset everything, including banding/conditional formats
+```
+
+## Referencing columns by name
+
+`gs4_cols()` targets one or more columns by their header name instead of a
+column letter -- handy when you don't want to count columns by hand, and
+robust to a sheet's columns being reordered later.
+
+```{r}
+range_format(ss, sheet = "cars", range = gs4_cols("mpg", "hp"), number_format = "0.0")
+```
+
+If the named columns aren't contiguous, this expands into one `GridRange`
+per contiguous run under the hood; the header row itself is excluded by
+default (pass `include_header = TRUE` to include it).
+
+## Conditional formatting
+
+Boolean rules are built with `cf_cell_value()` (or `cf_text_contains()`,
+`cf_text_eq()`, `cf_custom_formula()`, `cf_blank()`, `cf_not_blank()`) and a
+`cf_format()`, then applied with `range_add_conditional_format()`:
+
+```{r}
+range_add_conditional_format(
+  ss, sheet = "cars", range = gs4_cols("mpg"),
+  rule = cf_cell_value(">", 25),
+  format = cf_format(bold = TRUE, background_color = "#F4CCCC")
+)
+```
+
+Gradient (color-scale) rules use `cf_gradient()` and
+`range_add_gradient_format()`:
+
+```{r}
+range_add_gradient_format(
+  ss, sheet = "cars", range = gs4_cols("hp"),
+  gradient = cf_gradient(min_color = "white", max_color = "forestgreen")
+)
+```
+
+Conditional formatting only supports five cell properties in the Sheets
+API -- bold, italic, strikethrough, and foreground/background color --
+which is why `cf_format()` doesn't expose number formats or alignment.
+
+## Write and format in one call
+
+`range_write_format()` combines `googlesheets4::range_write()` with these
+formatting functions, and -- unlike `range_write()` itself -- creates the
+target sheet if it doesn't already exist, sized to fit the data:
+
+```{r}
+combined_data <- data.frame(x = c(5, 15, 25, 35), y = letters[1:4])
+
+range_write_format(
+  ss, sheet = "combined", data = combined_data,
+  header_background_color = "#D9E1F2",
+  conditional_formats = list(
+    list(range = "A2:A5", rule = cf_cell_value(">", 20),
+         format = cf_format(background_color = "#F4CCCC"))
+  )
+)
+```
+
+## Reusable table themes
+
+For a consistent table look applied in one call, `gs_theme()` bundles
+header style, zebra-striping (banding), per-column overrides, a border, and
+conditional formats into one reusable, inspectable object:
+
+```{r}
+my_theme <- gs_theme(
+  header = list(background_color = "#1F4E79", font_color = "white"),
+  banding = list(band1 = "white", band2 = "#DCE6F1"),
+  columns = list(mpg = list(number_format = "0.0")),
+  border = list(color = "gray40")
+)
+my_theme
+```
+
+`write_pretty_sheet()` is the theme-aware counterpart to
+`range_write_format()`: it writes a data frame and applies a theme in one
+call, creating the sheet first if needed.
+
+```{r}
+write_pretty_sheet(ss, data = mtcars, sheet = "themed", theme = my_theme)
+```
+
+`theme` can also be the name of a built-in preset (`"clean"`,
+`"professional"`, `"fun"`, or `"stylish"`), or omitted entirely to fall back
+to a plain default. `modify_theme()` tweaks an existing theme without
+rebuilding it from scratch:
+
+```{r}
+tweaked <- modify_theme(gs_theme_preset("professional"), banding = list(band2 = "lightyellow"))
+```
+
+The four presets also apply immediately to an already-written sheet, for
+when you don't need a reusable theme object:
+
+```{r}
+sheet_write(mtcars, ss, sheet = "mtcars2") |> gs_theme_professional()
+```
+
+## Reading a sheet's theme back
+
+`read_pretty_sheet()` is the theme-aware counterpart to
+`googlesheets4::range_read()`: it reads a sheet's data and reconstructs a
+`gs_theme()` describing how the table is formatted (header style, banding,
+per-column formatting, and any conditional-format rules), attached to the
+returned tibble as `attr(x, "prettysheets_theme")`. That makes it easy to
+copy a sheet's look elsewhere:
+
+```{r}
+styled <- read_pretty_sheet(ss, sheet = "themed")
+write_pretty_sheet(ss, data = styled, sheet = "themed_copy") # same theme, no `theme` argument needed
+```
+
+## Batching multiple calls into one request
+
+Every `prettysheets` function normally sends its own `batchUpdate` call as
+soon as it runs. Wrap a block of calls in `prettysheets_batch()` to collect
+them and send everything together in a single request instead, which
+matters if you're making many formatting calls in a row and want to stay
+comfortably under the Sheets API's rate limits:
+
+```{r}
+prettysheets_batch({
+  range_format(ss, sheet = "cars", range = "A1:K1", bold = TRUE)
+  range_format_border(ss, sheet = "cars", range = "A1:K1", color = "gray40")
+})
+```

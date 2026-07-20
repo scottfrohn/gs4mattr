@@ -25,9 +25,12 @@ Imports:
     utils
 Suggests:
     jsonlite,
+    knitr,
+    rmarkdown,
     testthat (>= 3.1.7),
     withr
 Config/testthat/edition: 3
+VignetteBuilder: knitr
 URL: https://github.com/scottfrohn/prettysheets
 BugReports: https://github.com/scottfrohn/prettysheets/issues
 Config/roxygen2/version: 8.0.0

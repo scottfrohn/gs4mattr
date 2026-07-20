@@ -94,13 +94,11 @@ cols_to_cell_limits <- function(cols, header, include_header = FALSE) {
 
   positions <- sort(unique(positions))
   run_id <- cumsum(c(1, diff(positions) != 1))
-  # unname() -- split() names each group by its run_id ("1", "2", ...), and
-  # that name would otherwise survive all the way out of
-  # resolve_grid_ranges(). Harmless for callers (like range_format()) that
-  # use each element on its own, but callers that bundle every element into
-  # one field (like range_add_conditional_format()'s `ranges = grid_ranges`)
-  # need a plain unnamed list -- a *named* list serializes to a JSON object
-  # instead of a JSON array, which silently breaks the request.
+  # split() names each group by its run_id ("1", "2", ...); unname() drops
+  # those, since a caller that bundles every element into one field (e.g.
+  # range_add_conditional_format()'s `ranges = grid_ranges`) needs a plain
+  # unnamed list here -- a named list serializes to a JSON object instead
+  # of the array the Sheets API expects for a repeated field.
   runs <- unname(split(positions, run_id))
 
   start_row <- if (isTRUE(include_header)) cols$header_row else cols$header_row + 1L

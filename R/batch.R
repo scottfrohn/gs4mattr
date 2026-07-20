@@ -27,13 +27,10 @@ apply_requests <- function(ss, requests) {
       requests = requests
     )
   )
+  # request_make() returns the raw httr response as-is; it doesn't check the
+  # status code. Piping it through response_process() raises a real error on
+  # a rejected request instead of failing silently.
   resp <- googlesheets4::request_make(req)
-  # request_make() returns the raw httr response as-is -- it does NOT check
-  # the status code or raise on a 4xx/5xx. Without this, a rejected request
-  # (e.g. a malformed body) fails completely silently: no R error, and
-  # whatever this call was supposed to do just doesn't happen. Piping it
-  # through response_process() makes a bad request surface as a real error
-  # instead of vanishing.
   gargle::response_process(resp)
 
   invisible(ss)

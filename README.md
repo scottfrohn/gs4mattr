@@ -54,32 +54,33 @@ devtools::install_github("scottfrohn/prettysheets")
   `sheet_format_header()` / `sheet_freeze()` are for the case where you
   wrote data with `range_write()` instead (which does *not* auto-style).
 
+## Reusable table themes
+
+Beyond one-off formatting calls, `prettysheets` also has a theme system for
+building and reapplying a consistent table style:
+
+```r
+my_theme <- gs_theme(
+  header = list(background_color = "#1F4E79", font_color = "white"),
+  banding = list(band1 = "white", band2 = "#DCE6F1"),
+  columns = list(price = list(number_format = "$#,##0.00")),
+  border = list(color = "gray40")
+)
+
+write_pretty_sheet(ss, data = mtcars, sheet = "mtcars", theme = my_theme)
+
+# read the data back together with the theme actually applied to it
+styled <- read_pretty_sheet(ss, sheet = "mtcars")
+write_pretty_sheet(ss2, data = styled, sheet = "mtcars") # same look, new sheet
+```
+
+Four built-in presets (`gs_theme_clean()`, `gs_theme_professional()`,
+`gs_theme_fun()`, `gs_theme_stylish()`) apply immediately to an existing
+sheet; see `vignette("prettysheets")` for a fuller walkthrough.
+
 ## A known API limitation (not a prettysheets limitation)
 
 The Sheets API's conditional formatting only supports **boolean** and
 **gradient** rules — there's no data-bar rule in the API at all (data bars
 are a Sheets UI-only feature), so `prettysheets` doesn't offer
 `range_add_databar()`.
-
-## Development status
-
-This package was scaffolded by hand (DESCRIPTION, R/, tests/) without a
-local R installation available at the time, so nothing here has been run or
-roxygenized yet. Before you rely on it:
-
-1. `devtools::document()` to regenerate `NAMESPACE`/`man/` from the roxygen
-   comments already in `R/*.R`.
-2. `devtools::load_all()` and `devtools::check()`.
-3. `testthat::test_local()` — the offline unit tests (color conversion,
-   the `fields`-mask logic, conditional-format builders) should all pass
-   with no network or Google auth needed.
-4. Everything that actually talks to the Sheets API (`range_format()`,
-   `sheet_freeze()`, `range_add_conditional_format()`, etc.) has **not**
-   been exercised against a real spreadsheet yet — do that next, ideally
-   against a throwaway test Sheet, and watch in particular for:
-   - the exact `request_generate()` endpoint nickname
-     (`"sheets.spreadsheets.batchUpdate"` — confirm against
-     `googlesheets4::gs4_endpoints()`),
-   - whether the `fields` mask syntax used for `gridProperties` in
-     `sheet_freeze()` (`"gridProperties(frozenRowCount,frozenColumnCount)"`)
-     is accepted as-is or needs adjusting.

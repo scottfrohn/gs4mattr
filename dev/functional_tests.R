@@ -151,7 +151,7 @@ range_format(ss, sheet = "basic", range = "1:1",
 
 # Expect: H3:I4 turns bold with a dark yellow background -- a gs4_palette
 # name passed straight as background_color, exercising gs4_color()'s
-# palette-name fallback (previously errored: "invalid color name")
+# palette-name fallback
 range_format(ss, sheet = "basic", range = "H3:I4",
              bold = TRUE, background_color = "dark yellow 1")
 
@@ -167,15 +167,14 @@ gs_theme_stylish(ss, sheet = "g6_items")
 
 # Expect: g6_items goes back to fully unformatted -- bold/background/etc.
 # from gs_theme_clean() AND the alternating-color banding it added are both
-# gone (previously the banding lingered, since it's a separate sheet-level
-# object sheet_clear_format() didn't used to know to remove)
+# gone (banding is a separate sheet-level object, so sheet_clear_format()
+# has to remove it explicitly, not just reset cell formatting)
 sheet_clear_format(ss, sheet = "g6_items")
 
 
 # ── 4. range_format_border() ────────────────────────────────────────────────
 # Expect: a solid box around the OUTSIDE of D3:F5 only -- no lines between
-# the 9 cells inside it (sides defaults to "outside", same as the old
-# default of sides = "all" before prettysheets's border rework)
+# the 9 cells inside it (sides defaults to "outside")
 range_format_border(ss, sheet = "basic", range = "D3:F5",
                     style = "SOLID_MEDIUM", color = gs4_palette_color("dark gray 3"))
 
@@ -223,7 +222,6 @@ sheet_format_tabcolor(ss, sheet = "basic", color = "forestgreen")
 sheet_format_tabcolor(ss, sheet = "basic", color = NULL)
 
 # Expect: same tab turns a lighter green -- a gs4_palette name this time
-# (previously errored: "invalid color name 'light green 1'")
 sheet_format_tabcolor(ss, sheet = "basic", color = "light green 1")
 
 
@@ -396,8 +394,7 @@ my_theme # print method -- eyeball the summary before sending anything to the AP
 # Expect: a new "pretty_custom" sheet, written AND themed in one call -- dark
 # blue header/white text, white/pale-blue banding, thin gray border, "score"
 # right-aligned with one decimal (the column override winning over the
-# type-inferred default), header frozen (freeze_header defaults to TRUE, a
-# behavior gs_theme_*() didn't have before this)
+# type-inferred default), header frozen (freeze_header defaults to TRUE)
 googlesheets4::sheet_write(theme_demo, ss, sheet = "pretty_custom")
 write_pretty_sheet(ss, data = theme_demo, sheet = "pretty_custom", theme = my_theme)
 
