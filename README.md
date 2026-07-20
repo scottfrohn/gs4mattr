@@ -42,8 +42,7 @@ sheet_freeze(ss, n_rows = 1)
 ## Installation
 
 ```r
-# once pushed to GitHub:
-devtools::install_github("scottfrohn/prettysheets")
+pak::pak("scottfrohn/prettysheets")
 ```
 
 ## What's already covered by googlesheets4 (not duplicated here)
