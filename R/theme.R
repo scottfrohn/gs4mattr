@@ -557,7 +557,11 @@ apply_gs_theme <- function(ss, sheet = NULL, data = NULL, theme) {
 #' skip an extra read of the sheet; omit it and the theme reads the
 #' written values back live to infer column types -- which is what makes
 #' `googlesheets4::sheet_write(data, ss) |> gs_theme_clean()` work as a
-#' pipe, since `sheet_write()` returns `ss`, not `data`.
+#' pipe, since `sheet_write()` returns `ss`, not `data`. Note that this only
+#' works unmodified when `sheet_write()` targets the default sheet -- since
+#' `sheet_write()` returns just `ss`, not which sheet it wrote to, `sheet`
+#' still needs to be named explicitly on the `gs_theme_*()` side too if
+#' `sheet_write()`'s own `sheet` argument was.
 #'
 #' Re-theming a table already themed by one of these functions (or already
 #' carrying alternating colors applied some other way, e.g. by hand in the
@@ -593,8 +597,12 @@ apply_gs_theme <- function(ss, sheet = NULL, data = NULL, theme) {
 #' ss <- googlesheets4::gs4_create("prettysheets-theme-demo", sheets = mtcars)
 #' gs_theme_clean(ss)
 #'
-#' # or, piped straight from writing the data, with no `data` argument:
-#' googlesheets4::sheet_write(mtcars, ss, sheet = "mtcars") |> gs_theme_professional()
+#' # or, piped straight from writing the data, with no `data` argument -- note
+#' # `sheet` still has to be named on BOTH sides: sheet_write() returns `ss`
+#' # alone, not the sheet it just wrote to, so gs_theme_professional() has no
+#' # way to know "mtcars" was the target sheet unless told directly
+#' googlesheets4::sheet_write(mtcars, ss, sheet = "mtcars") |>
+#'   gs_theme_professional(sheet = "mtcars")
 #' }
 NULL
 

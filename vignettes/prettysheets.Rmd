@@ -34,6 +34,9 @@ library(googlesheets4)
 library(prettysheets)
 
 ss <- gs4_create("prettysheets-demo", sheets = list(cars = mtcars))
+
+# Open sheet in browser
+gs4_browse(ss)
 ```
 
 ## Basic cell formatting
@@ -46,6 +49,8 @@ strings or `cellranger` helpers).
 ```{r}
 range_format(ss, sheet = "cars", range = "A1:K1", bold = TRUE, background_color = "#D9E1F2")
 range_format(ss, sheet = "cars", range = "B2:B33", number_format = "0.0", horizontal_alignment = "RIGHT")
+range_format(ss, sheet = "cars", range = "C:C", number_format = "0.0", horizontal_alignment = "LEFT")
+range_format(ss, sheet = "cars", range = "D:D", number_format = "0.0", horizontal_alignment = "LEFT", include_header = T)
 ```
 
 Repeated calls layer on top of each other rather than overwriting -- only
@@ -64,11 +69,13 @@ gs4_color("light cornflower blue 1")
 Other structural helpers follow the same pattern:
 
 ```{r}
-range_format_border(ss, sheet = "cars", range = "A1:K33", sides = "outside", color = "gray40")
-range_merge(ss, sheet = "cars", range = "A1:B1")
+range_format_border(ss, sheet = "cars", range = "A1:K33", sides = "inside", color = "blue")
+range_merge(ss, sheet = "cars", range = "A2:B2")
+range_unmerge(ss, sheet = "cars", range = "A2:B2")
 sheet_freeze(ss, sheet = "cars", n_rows = 1)
 sheet_format_header(ss, sheet = "cars") # bold header + freeze, for data written with range_write()
 sheet_format_tabcolor(ss, sheet = "cars", color = "forestgreen")
+sheet_format_tabcolor(ss, sheet = "cars", color = NULL)
 sheet_clear_format(ss, sheet = "cars") # reset everything, including banding/conditional formats
 ```
 
@@ -164,14 +171,23 @@ rebuilding it from scratch:
 
 ```{r}
 tweaked <- modify_theme(gs_theme_preset("professional"), banding = list(band2 = "lightyellow"))
+
+write_pretty_sheet(ss, data = mtcars, sheet = "tweaked", theme = tweaked)
 ```
 
 The four presets also apply immediately to an already-written sheet, for
 when you don't need a reusable theme object:
 
 ```{r}
-sheet_write(mtcars, ss, sheet = "mtcars2") |> gs_theme_professional()
+sheet_write(mtcars, ss, sheet = "cars2") |> gs_theme_professional(sheet = "cars2")
 ```
+
+`sheet` has to be named on both sides here: `sheet_write()` returns `ss`
+alone, not the sheet it just wrote to, so `gs_theme_professional()` has no
+way to know "cars2" was the target unless told directly -- leaving it out
+would theme whatever the spreadsheet's first visible sheet happens to be
+instead. (Omitting `sheet` from *both* calls works fine, since they'd then
+consistently agree on the same default sheet.)
 
 ## Reading a sheet's theme back
 
