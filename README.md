@@ -61,8 +61,6 @@ range_add_gradient_format(
   range = "D2:D33",
   gradient = cf_gradient(min_color = "white", max_color = "forestgreen")
 )
-
-sheet_freeze(ss, n_rows = 1)
 ```
 
 ## Installation
